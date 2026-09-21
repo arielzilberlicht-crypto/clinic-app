@@ -1,9 +1,11 @@
 // Maps a raw Sheets row (keyed by literal header text) onto the logical
-// field names the rest of the app uses, matching header names case- and
-// whitespace-insensitively. Never assume a fixed column position: Make's
-// column order is not a contract, only the header text is.
+// field names the rest of the app uses, matching header names case-,
+// separator- and whitespace-insensitively (e.g. "Patient_ID", "patient id"
+// and "Patient ID" are all treated as the same header). Never assume a
+// fixed column position: Make's column order is not a contract, only the
+// header text is.
 function normalize(text) {
-  return String(text || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  return String(text || '').trim().toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ');
 }
 
 function mapByAliases(rawRecord, aliasMap) {

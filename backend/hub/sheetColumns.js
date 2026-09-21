@@ -1,52 +1,58 @@
-// Header aliases per tab. The primary alias for each field is the header
-// text implied by the build brief; add more aliases here (never hard-coded
-// column letters) if the real spreadsheet uses different wording - this file
-// is the only place that should need to change.
+// Header aliases per tab. Each field lists every header text seen in
+// practice (the phrasing implied by the build brief, plus whatever Make
+// actually writes in the real spreadsheet - confirmed 2026-09-21 against
+// the live "Clinic Automation Hub - Dr Ariel Zilberlicht" sheet). Add more
+// aliases here (never hard-coded column letters) if the header wording
+// changes again - this file is the only place that should need to change.
+// Matching is case/separator/whitespace-insensitive (see mapRow.js), so
+// "Patient_ID", "patient id" and "Patient ID" all match the same alias.
 module.exports = {
   appointments: {
-    calendarEventId: ['calendar event id'],
-    patientId: ['patient id'],
-    phone: ['phone'],
-    name: ['name'],
-    createdAt: ['created at'],
-    appointmentStart: ['appointment start'],
-    clinic: ['clinic'],
-    insurer: ['insurer'],
-    source: ['source'],
-    status: ['status'],
-    rawId: ['raw id as received', 'raw id'],
-    confirmedId: ['confirmed id'],
-    idVerification: ['id verification'],
-    engagement: ['engagement'],
-    confirmedAt: ['confirmed at']
+    calendarEventId: ['calendar event id', 'Calendar_Event_ID'],
+    patientId: ['patient id', 'Patient_ID'],
+    phone: ['phone', 'Phone'],
+    name: ['name', 'Patient_Name'],
+    createdAt: ['created at', 'Created_At'],
+    appointmentStart: ['appointment start', 'Appointment_DateTime'],
+    clinic: ['clinic', 'Location'],
+    // No insurer/HMO column exists in the real sheet today - see note to
+    // the doctor. Kept here so it starts working the moment one is added.
+    insurer: ['insurer', 'Insurer', 'HMO'],
+    source: ['source', 'Source'],
+    status: ['status', 'Status'],
+    rawId: ['raw id as received', 'raw id', 'Source_ID'],
+    confirmedId: ['confirmed id', 'Confirmed_ID'],
+    idVerification: ['id verification', 'ID_Verification_Status'],
+    engagement: ['engagement', 'Engagement_Status'],
+    confirmedAt: ['confirmed at', 'Engagement_Confirmed_At']
   },
 
   botState: {
-    phone: ['phone'],
-    patientId: ['patient id'],
-    state: ['state'],
-    eventId: ['event id'],
-    updatedAt: ['updated at'],
-    expectedReplyType: ['expected reply type']
+    phone: ['phone', 'Phone'],
+    patientId: ['patient id', 'Patient_ID'],
+    state: ['state', 'Current_State'],
+    eventId: ['event id', 'Last_Appointment_ID'],
+    updatedAt: ['updated at', 'Updated_At'],
+    expectedReplyType: ['expected reply type', 'Expected_Reply_Type']
   },
 
   communications: {
-    messageId: ['message id'],
-    patientId: ['patient id'],
-    phone: ['phone'],
-    time: ['time'],
-    direction: ['direction'],
-    type: ['type'],
-    source: ['source'],
-    appointmentId: ['appointment id'],
-    status: ['status']
+    messageId: ['message id', 'Communication_ID'],
+    patientId: ['patient id', 'Patient_ID'],
+    phone: ['phone', 'Phone'],
+    time: ['time', 'Timestamp'],
+    direction: ['direction', 'Direction'],
+    type: ['type', 'Message_Type'],
+    source: ['source', 'Scenario_Source'],
+    appointmentId: ['appointment id', 'Appointment_or_Surgery_ID'],
+    status: ['status', 'Delivery_Status']
   },
 
   patients: {
-    patientId: ['patient id'],
-    name: ['name'],
-    phone: ['phone'],
-    idNumber: ['id number', 'id']
+    patientId: ['patient id', 'Patient_ID'],
+    name: ['name', 'Full_Name'],
+    phone: ['phone', 'Phone'],
+    idNumber: ['id number', 'id', 'Confirmed_ID']
   },
 
   // The Leads sheet was described to us by column letter (A-G), not by
