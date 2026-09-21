@@ -8,6 +8,7 @@ import TemplatesPage from './pages/TemplatesPage';
 import IntakePage from './pages/IntakePage';
 import AppointmentForm from './components/AppointmentForm';
 import { calendarApi } from './services/api';
+import HubApp from './hub/HubApp';
 
 function Sidebar({ onAddAppointment }) {
   const navigate = useNavigate();
@@ -57,6 +58,11 @@ function Sidebar({ onAddAppointment }) {
         <button className="nav-item" onClick={onAddAppointment}>
           <span className="icon">➕</span>
           הוסף תור
+        </button>
+
+        <button className="nav-item" onClick={() => window.open('/hub', '_blank', 'noopener')}>
+          <span className="icon">🩺</span>
+          Clinic Automation Hub
         </button>
       </nav>
 
@@ -119,6 +125,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/intake" element={<IntakePage />} />
+        <Route path="/hub/*" element={<HubApp />} />
         <Route path="/*" element={<AppLayout />} />
       </Routes>
     </BrowserRouter>
