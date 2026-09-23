@@ -38,11 +38,14 @@ clinic-app/
 │   │   ├── patients.js     # Patient management
 │   │   ├── calendar.js     # Google Calendar OAuth + sync
 │   │   ├── templates.js    # Message templates
-│   │   └── intake.js       # Patient self-registration
+│   │   ├── intake.js       # Patient self-registration
+│   │   └── feedback.js     # מסך שליחת משובים - קריאה ל-Make
 │   └── services/
 │       ├── googleCalendar.js  # Google Calendar API
 │       ├── greenApi.js        # WhatsApp via Green API
-│       └── scheduler.js       # node-cron daily reminders
+│       ├── scheduler.js       # node-cron daily reminders
+│       ├── make.js            # קריאות ל-Make scenarios (משובים)
+│       └── feedbackLogic.js   # לוגיקה טהורה של מסך המשובים (נבדקת ב-feedbackLogic.test.js)
 ├── frontend/
 │   └── src/
 │       ├── pages/
@@ -51,6 +54,7 @@ clinic-app/
 │       │   ├── AppointmentsPage.jsx
 │       │   ├── PatientsPage.jsx
 │       │   ├── TemplatesPage.jsx  # עריכת תבניות
+│       │   ├── FeedbackPage.jsx   # שליחת משובים (MedReviews + ביקורות גוגל)
 │       │   └── IntakePage.jsx     # טופס מטופלת (/intake)
 │       └── components/
 │           ├── AppointmentForm.jsx  # הוספת תור
@@ -83,3 +87,13 @@ clinic-app/
 מופעלות כל בוקר בשעה 08:00 (שעון ישראל):
 - תזכורת 4 ימים לפני
 - תזכורת יומיים לפני
+
+## שליחת משובים (`/feedback`)
+
+מסך בסוף יום מרפאה: בוחרים תאריך, טוענים את רשימת המטופלות מהיומן (דרך תרחיש Make קיים), ומסמנים
+לכל מטופלת אילו הודעות לשלוח (MedReviews / ביקורת גוגל חיפה / ביקורת גוגל תל אביב). כל הלוגיקה
+(שליפת יומן, שליחת WhatsApp) חיה ב-Make; הדשבורד רק מציג, אוסף סימונים ומפעיל.
+
+1. עדכנו `MAKE_API_TOKEN` ב-`.env` (הרשאות מינימליות, מוגבל לצוות 787831 אם אפשר)
+2. כל עוד `FEEDBACK_SEND_SCENARIO_ID` ריק, כפתור "שלח" עובד מול mock מקומי (תרחיש השליחה טרם נבנה ב-Make)
+3. **מצב בדיקה** פעיל כברירת מחדל - כל ההודעות נשלחות למספר בדיקה בלבד; כיבוי דורש אישור מפורש במסך

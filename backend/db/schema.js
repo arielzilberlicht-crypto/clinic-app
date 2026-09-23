@@ -47,10 +47,23 @@ function initSchema() {
       value TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS feedback_audit (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      selected_date TEXT NOT NULL,
+      medreviews_count INTEGER NOT NULL DEFAULT 0,
+      google_haifa_count INTEGER NOT NULL DEFAULT 0,
+      google_tlv_count INTEGER NOT NULL DEFAULT 0,
+      test_mode INTEGER NOT NULL DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE INDEX IF NOT EXISTS idx_appointments_date ON appointments(appointment_date);
     CREATE INDEX IF NOT EXISTS idx_appointments_calendar_id ON appointments(calendar_event_id);
     CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
   `);
+
+  // Test mode defaults to ON; turning it off is a deliberate, explicit action from the UI.
+  db.prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES ('feedback_test_mode', 'true')`).run();
 
   // Seed default message templates
   const templates = [

@@ -41,4 +41,12 @@ export const templatesApi = {
   update: (name, content) => api.put(`/templates/${name}`, { content })
 };
 
+// ─── Feedback ─────────────────────────────────────────────────────────────────
+export const feedbackApi = {
+  getAppointments: (date) => api.get('/feedback/appointments', { params: { date } }),
+  getSettings: () => api.get('/feedback/settings'),
+  updateSettings: (data) => api.put('/feedback/settings', data),
+  send: (data) => api.post('/feedback/send', data)
+};
+
 export default api;

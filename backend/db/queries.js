@@ -167,4 +167,27 @@ const templateQueries = {
   `)
 };
 
-module.exports = { appointmentQueries, patientQueries, templateQueries };
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+const settingsQueries = {
+  get: db.prepare(`SELECT value FROM settings WHERE key = ?`),
+
+  set: db.prepare(`
+    INSERT INTO settings (key, value) VALUES (?, ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `)
+};
+
+// ─── Feedback ─────────────────────────────────────────────────────────────────
+
+const feedbackQueries = {
+  insertAudit: db.prepare(`
+    INSERT INTO feedback_audit (
+      selected_date, medreviews_count, google_haifa_count, google_tlv_count, test_mode
+    ) VALUES (
+      @selected_date, @medreviews_count, @google_haifa_count, @google_tlv_count, @test_mode
+    )
+  `)
+};
+
+module.exports = { appointmentQueries, patientQueries, templateQueries, settingsQueries, feedbackQueries };

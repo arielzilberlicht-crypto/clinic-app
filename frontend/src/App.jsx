@@ -5,6 +5,7 @@ import CalendarPage from './pages/CalendarPage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import PatientsPage from './pages/PatientsPage';
 import TemplatesPage from './pages/TemplatesPage';
+import FeedbackPage from './pages/FeedbackPage';
 import IntakePage from './pages/IntakePage';
 import AppointmentForm from './components/AppointmentForm';
 import { calendarApi } from './services/api';
@@ -25,7 +26,8 @@ function Sidebar({ onAddAppointment }) {
     { path: '/calendar', label: 'יומן', icon: '📅' },
     { path: '/appointments', label: 'תורים', icon: '🗓️' },
     { path: '/patients', label: 'מטופלות', icon: '👩‍⚕️' },
-    { path: '/templates', label: 'תבניות הודעה', icon: '💬' }
+    { path: '/templates', label: 'תבניות הודעה', icon: '💬' },
+    { path: '/feedback', label: 'שליחת משובים', icon: '⭐' }
   ];
 
   const handleConnectCalendar = async () => {
@@ -101,6 +103,7 @@ function AppLayout() {
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/patients" element={<PatientsPage />} />
           <Route path="/templates" element={<TemplatesPage />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
         </Routes>
       </main>
 
