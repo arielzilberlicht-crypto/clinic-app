@@ -7,7 +7,7 @@ const {
   isPhoneValid,
   applyTestModePhone,
   buildSendSummary,
-  buildMockSendResults
+  buildUniformSendResults
 } = require('./feedbackLogic');
 
 test('parseAppointmentsOutput: array passthrough', () => {
@@ -74,16 +74,18 @@ test('buildSendSummary: counts each option independently', () => {
   assert.deepEqual(buildSendSummary(items), { medreviews: 2, googleHaifa: 1, googleTlv: 1 });
 });
 
-test('buildMockSendResults: invalid phone fails, valid phone sends, does not stop at first failure', () => {
-  const items = [
-    { event_id: 'a', phone: '0522904352' },
-    { event_id: 'b', phone: '0' },
-    { event_id: 'c', phone: '0501234567' }
-  ];
-  const results = buildMockSendResults(items);
-  assert.deepEqual(results, [
+test('buildUniformSendResults: applies the same status to every item (Make reports one aggregate status)', () => {
+  const items = [{ event_id: 'a' }, { event_id: 'b' }, { event_id: 'c' }];
+  assert.deepEqual(buildUniformSendResults(items, 'sent'), [
     { event_id: 'a', status: 'sent', reason: null },
-    { event_id: 'b', status: 'failed', reason: 'מספר טלפון לא תקין' },
+    { event_id: 'b', status: 'sent', reason: null },
     { event_id: 'c', status: 'sent', reason: null }
+  ]);
+});
+
+test('buildUniformSendResults: carries an optional shared reason', () => {
+  const items = [{ event_id: 'a' }];
+  assert.deepEqual(buildUniformSendResults(items, 'failed', 'שגיאה בשליחה'), [
+    { event_id: 'a', status: 'failed', reason: 'שגיאה בשליחה' }
   ]);
 });

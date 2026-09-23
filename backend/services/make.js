@@ -5,6 +5,9 @@ const MAKE_BASE_URL = 'https://eu2.make.com/api/v2';
 // "משיכת רשימת מטופלות ליום - משובים", eu2, team 787831 - existing, active scenario.
 const FETCH_APPOINTMENTS_SCENARIO_ID = '9852448';
 
+// "שליחת בקשות משוב - מהדשבורד", eu2, team 787831 - existing, active scenario.
+const SEND_FEEDBACK_SCENARIO_ID = '9853470';
+
 function getToken() {
   const token = process.env.MAKE_API_TOKEN;
   if (!token) throw new Error('MAKE_API_TOKEN not configured');
@@ -26,4 +29,9 @@ async function fetchAppointmentsForDate(date) {
   return result && result.outputs;
 }
 
-module.exports = { runScenario, fetchAppointmentsForDate, FETCH_APPOINTMENTS_SCENARIO_ID };
+module.exports = {
+  runScenario,
+  fetchAppointmentsForDate,
+  FETCH_APPOINTMENTS_SCENARIO_ID,
+  SEND_FEEDBACK_SCENARIO_ID
+};

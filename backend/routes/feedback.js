@@ -8,7 +8,7 @@ const {
   isPhoneValid,
   applyTestModePhone,
   buildSendSummary,
-  buildMockSendResults
+  buildUniformSendResults
 } = require('../services/feedbackLogic');
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -70,17 +70,20 @@ router.post('/send', async (req, res) => {
 
   const testMode = getTestMode();
   const preparedItems = applyTestModePhone(items, testMode);
-  const sendScenarioId = process.env.FEEDBACK_SEND_SCENARIO_ID;
+
+  // mode="LIVE" is the only value that reaches real recipients - a second, Make-side
+  // guard on top of the dashboard's own test mode (see brief §4/§6).
+  const mode = testMode ? 'TEST' : 'LIVE';
 
   let results;
   try {
-    if (sendScenarioId) {
-      const result = await makeService.runScenario(sendScenarioId, { items: preparedItems });
-      results = (result && result.outputs && result.outputs.results) || [];
-    } else {
-      console.warn('[Feedback] FEEDBACK_SEND_SCENARIO_ID not configured, using mock send');
-      results = buildMockSendResults(preparedItems);
+    const result = await makeService.runScenario(makeService.SEND_FEEDBACK_SCENARIO_ID, { mode, items: preparedItems });
+    const status = result && result.outputs && result.outputs.status;
+    if (status !== 'completed') {
+      throw new Error(`Unexpected Make status: ${status}`);
     }
+    // The scenario reports one aggregate status, not a per-item result.
+    results = buildUniformSendResults(items, 'sent');
   } catch (err) {
     console.error('[Feedback] Send error:', err.message);
     return res.status(502).json({ error: 'שגיאה בשליחה דרך Make' });
@@ -96,7 +99,7 @@ router.post('/send', async (req, res) => {
     test_mode: testMode ? 1 : 0
   });
 
-  res.json({ results, testMode, mocked: !sendScenarioId });
+  res.json({ results, testMode });
 });
 
 module.exports = router;

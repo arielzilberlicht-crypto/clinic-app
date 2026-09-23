@@ -42,16 +42,10 @@ function buildSendSummary(items) {
   }, { medreviews: 0, googleHaifa: 0, googleTlv: 0 });
 }
 
-// Used until the real Make send scenario exists (see FEEDBACK_SEND_SCENARIO_ID).
-function buildMockSendResults(items) {
-  return items.map(item => {
-    const valid = isPhoneValid(item.phone);
-    return {
-      event_id: item.event_id,
-      status: valid ? 'sent' : 'failed',
-      reason: valid ? null : 'מספר טלפון לא תקין'
-    };
-  });
+// The send scenario (9853470) reports one aggregate `status`, not a per-item result,
+// so every submitted item gets the same outcome for a given call.
+function buildUniformSendResults(items, status, reason = null) {
+  return items.map(item => ({ event_id: item.event_id, status, reason }));
 }
 
 module.exports = {
@@ -61,5 +55,5 @@ module.exports = {
   isPhoneValid,
   applyTestModePhone,
   buildSendSummary,
-  buildMockSendResults
+  buildUniformSendResults
 };
