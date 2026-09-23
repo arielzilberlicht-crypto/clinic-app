@@ -42,12 +42,20 @@ const config = {
 
   allowedUsers: parseAllowedUsers(),
 
+  // "שליחת משובים" tab - separate from the Sheets read above: this calls two
+  // on-demand Make scenarios directly (today's calendar list + the send action).
+  makeApiToken: process.env.MAKE_API_TOKEN || '',
+
   isSheetsConfigured() {
     return Boolean(this.spreadsheetId && this.serviceAccountEmail && this.serviceAccountKey);
   },
 
   isAuthConfigured() {
     return Boolean(this.oauthClientId && this.sessionSecret);
+  },
+
+  isMakeConfigured() {
+    return Boolean(this.makeApiToken);
   }
 };
 

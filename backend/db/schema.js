@@ -79,6 +79,10 @@ function initSchema() {
   for (const t of templates) {
     insertTemplate.run(t.name, t.content);
   }
+
+  // Feedback tab: test mode defaults to ON; turning it off is a deliberate,
+  // explicit action from the UI (see backend/hub/routes/feedback.js).
+  db.prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES ('feedback_test_mode', 'true')`).run();
 }
 
 module.exports = { initSchema };

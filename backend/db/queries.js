@@ -167,4 +167,15 @@ const templateQueries = {
   `)
 };
 
-module.exports = { appointmentQueries, patientQueries, templateQueries };
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+const settingsQueries = {
+  get: db.prepare(`SELECT value FROM settings WHERE key = ?`),
+
+  set: db.prepare(`
+    INSERT INTO settings (key, value) VALUES (?, ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `)
+};
+
+module.exports = { appointmentQueries, patientQueries, templateQueries, settingsQueries };

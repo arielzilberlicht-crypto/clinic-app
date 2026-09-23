@@ -7,17 +7,20 @@ import HubNeedsAttention from './pages/HubNeedsAttention';
 import HubToday from './pages/HubToday';
 import HubLeads from './pages/HubLeads';
 import HubPatientCard from './pages/HubPatientCard';
+import HubFeedback from './pages/HubFeedback';
 
 const NAV_ITEMS = [
   { path: '/hub', label: 'סקירה כללית', end: true },
   { path: '/hub/needs-attention', label: 'דורש טיפול' },
   { path: '/hub/today', label: 'היום' },
   { path: '/hub/leads', label: 'לידים' },
-  { path: '/hub/patients', label: 'כרטיס מטופלת' }
+  { path: '/hub/patients', label: 'כרטיס מטופלת' },
+  { path: '/hub/feedback', label: 'משובים', doctorOnly: true }
 ];
 
 function HubShell() {
   const { user, loading, logout } = useHubAuth();
+  const navItems = NAV_ITEMS.filter(item => !item.doctorOnly || user?.role === 'DOCTOR');
 
   if (loading) {
     return (
@@ -47,7 +50,7 @@ function HubShell() {
       </header>
 
       <nav className="hub-nav">
-        {NAV_ITEMS.map(item => (
+        {navItems.map(item => (
           <NavLink
             key={item.path}
             to={item.path}
@@ -67,6 +70,7 @@ function HubShell() {
           <Route path="/leads" element={<HubLeads />} />
           <Route path="/patients" element={<HubPatientCard />} />
           <Route path="/patients/:patientId" element={<HubPatientCard />} />
+          <Route path="/feedback" element={<HubFeedback />} />
           <Route path="*" element={<Navigate to="/hub" replace />} />
         </Routes>
       </main>
