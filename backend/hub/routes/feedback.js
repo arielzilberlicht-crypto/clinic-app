@@ -88,7 +88,7 @@ router.post('/send', async (req, res) => {
 
   let results;
   try {
-    const result = await makeClient.runScenario(makeClient.SEND_FEEDBACK_SCENARIO_ID, { mode, items: preparedItems });
+    const result = await makeClient.runScenario(makeClient.SEND_FEEDBACK_SCENARIO_ID, { mode, visit_date: date, items: preparedItems });
     const status = result && result.outputs && result.outputs.status;
     if (status !== 'completed') {
       throw new Error(`Unexpected Make status: ${status}`);
