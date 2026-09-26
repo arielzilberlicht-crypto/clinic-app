@@ -9,6 +9,13 @@ const FETCH_APPOINTMENTS_SCENARIO_ID = '9852448';
 // "שליחת בקשות משוב - מהדשבורד", eu2, team 787831 - existing, active scenario.
 const SEND_FEEDBACK_SCENARIO_ID = '9853470';
 
+// "Feedback_Fetch_Cache" data store: 9852448's run() response never reliably carries
+// `outputs` back through the API (confirmed empirically - see git history for this
+// file), so the scenario now also writes its result here (before its ReturnData
+// module, which otherwise short-circuits anything placed after it) and the dashboard
+// reads it back by key instead of relying on the run/logs API for the payload.
+const FEEDBACK_FETCH_DATASTORE_ID = 190048;
+
 function getToken() {
   if (!config.makeApiToken) throw new Error('MAKE_API_TOKEN not configured');
   return config.makeApiToken;
@@ -24,49 +31,26 @@ async function runScenario(scenarioId, data) {
   return res.data;
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function getExecution(scenarioId, executionId) {
+async function getDataStoreRecord(dataStoreId, key) {
   const token = getToken();
   const res = await axios.get(
-    `${MAKE_BASE_URL}/scenarios/${scenarioId}/logs/${executionId}`,
+    `${MAKE_BASE_URL}/data-stores/${dataStoreId}/data`,
     { headers: { Authorization: `Token ${token}` } }
   );
-  return res.data;
-}
-
-// The run() response doesn't always carry `outputs` inline (per Make's docs, this can
-// depend on execution timing) - fall back to a separate execution lookup when it's missing.
-async function runScenarioAndGetOutputs(scenarioId, data) {
-  const runResult = await runScenario(scenarioId, data);
-  if (runResult && runResult.outputs) return runResult.outputs;
-
-  if (!runResult || !runResult.executionId) return undefined;
-
-  // TEMPORARY DIAGNOSTIC - testing whether outputs need a moment to become queryable.
-  await sleep(3000);
-
-  const detail = await getExecution(scenarioId, runResult.executionId);
-  // TEMPORARY DIAGNOSTIC - full JSON this time (still no patient content: this is
-  // scenario/execution metadata, not appointment data), to rule out a wrong field name.
-  console.log('[makeClient][DEBUG] full execution detail:', JSON.stringify(detail));
-  return detail && (
-    detail.outputs ||
-    (detail.execution && detail.execution.outputs) ||
-    (detail.scenarioLog && detail.scenarioLog.outputs)
-  );
+  const records = Array.isArray(res.data) ? res.data : (res.data && res.data.records) || [];
+  return records.find(r => r.key === key);
 }
 
 async function fetchAppointmentsForDate(date) {
-  return runScenarioAndGetOutputs(FETCH_APPOINTMENTS_SCENARIO_ID, { date });
+  await runScenario(FETCH_APPOINTMENTS_SCENARIO_ID, { date });
+  const record = await getDataStoreRecord(FEEDBACK_FETCH_DATASTORE_ID, date);
+  return { appointments: record && record.data && record.data.appointments_json };
 }
 
 module.exports = {
   runScenario,
-  runScenarioAndGetOutputs,
   fetchAppointmentsForDate,
   FETCH_APPOINTMENTS_SCENARIO_ID,
-  SEND_FEEDBACK_SCENARIO_ID
+  SEND_FEEDBACK_SCENARIO_ID,
+  FEEDBACK_FETCH_DATASTORE_ID
 };

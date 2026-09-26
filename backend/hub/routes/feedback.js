@@ -31,15 +31,7 @@ router.get('/appointments', async (req, res) => {
 
   try {
     const outputs = await makeClient.fetchAppointmentsForDate(date);
-    // TEMPORARY DIAGNOSTIC - counts/types only, never patient content. Remove after debugging.
-    console.log('[Hub Feedback][DEBUG] outputs is', outputs === undefined ? 'undefined' : (outputs === null ? 'null' : typeof outputs));
-    console.log('[Hub Feedback][DEBUG] outputs keys:', outputs ? Object.keys(outputs) : '(none)');
-    console.log('[Hub Feedback][DEBUG] outputs.appointments type:', outputs && typeof outputs.appointments);
-    if (outputs && typeof outputs.appointments === 'string') {
-      console.log('[Hub Feedback][DEBUG] appointments string length:', outputs.appointments.length);
-    }
     const raw = parseAppointmentsOutput(outputs);
-    console.log('[Hub Feedback][DEBUG] parsed raw appointments count:', raw.length);
 
     // Explicit allowlist: `summary` may contain an ID number and must never reach the client.
     const appointments = raw.map(appt => ({
@@ -96,10 +88,12 @@ router.post('/send', async (req, res) => {
 
   let results;
   try {
-    const outputs = await makeClient.runScenarioAndGetOutputs(makeClient.SEND_FEEDBACK_SCENARIO_ID, { mode, visit_date: date, items: preparedItems });
-    const status = outputs && outputs.status;
-    if (status !== 'completed') {
-      throw new Error(`Unexpected Make status: ${status}`);
+    const result = await makeClient.runScenario(makeClient.SEND_FEEDBACK_SCENARIO_ID, { mode, visit_date: date, items: preparedItems });
+    // Make's own execution status: 1 = successful, 2 = successful with warnings.
+    // (outputs.status isn't used here - Make's run() response doesn't reliably carry
+    // outputs back through the API; see makeClient.js for the fetch side of this.)
+    if (result.status !== 1 && result.status !== 2) {
+      throw new Error(`Unexpected Make execution status: ${result.status}`);
     }
     // The scenario reports one aggregate status, not a per-item result.
     results = buildUniformSendResults(items, 'sent');
