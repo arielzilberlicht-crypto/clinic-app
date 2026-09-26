@@ -24,14 +24,15 @@ async function runScenario(scenarioId, data) {
   return res.data;
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function getExecution(scenarioId, executionId) {
   const token = getToken();
   const res = await axios.get(
     `${MAKE_BASE_URL}/scenarios/${scenarioId}/logs/${executionId}`,
-    {
-      params: { 'cols[]': 'outputs' },
-      headers: { Authorization: `Token ${token}` }
-    }
+    { headers: { Authorization: `Token ${token}` } }
   );
   return res.data;
 }
@@ -44,10 +45,13 @@ async function runScenarioAndGetOutputs(scenarioId, data) {
 
   if (!runResult || !runResult.executionId) return undefined;
 
+  // TEMPORARY DIAGNOSTIC - testing whether outputs need a moment to become queryable.
+  await sleep(3000);
+
   const detail = await getExecution(scenarioId, runResult.executionId);
-  // TEMPORARY DIAGNOSTIC - shape only, never patient content. Remove after debugging.
-  console.log('[makeClient][DEBUG] execution detail top-level keys:', detail ? Object.keys(detail) : '(none)');
-  console.log('[makeClient][DEBUG] scenarioLog keys:', detail && detail.scenarioLog ? Object.keys(detail.scenarioLog) : '(none)');
+  // TEMPORARY DIAGNOSTIC - full JSON this time (still no patient content: this is
+  // scenario/execution metadata, not appointment data), to rule out a wrong field name.
+  console.log('[makeClient][DEBUG] full execution detail:', JSON.stringify(detail));
   return detail && (
     detail.outputs ||
     (detail.execution && detail.execution.outputs) ||
