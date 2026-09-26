@@ -164,8 +164,10 @@ export default function HubFeedback() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map(r => (
-                    <tr key={r.event_id} style={{ opacity: r.phone_valid ? 1 : 0.5 }}>
+                  {rows.map(r => {
+                    const disabledReason = r.phone_valid ? undefined : 'לא זוהה מספר נייד תקין בכותרת האירוע ביומן - לא ניתן לשלוח בקשת משוב לאירוע זה';
+                    return (
+                    <tr key={r.event_id} style={{ opacity: r.phone_valid ? 1 : 0.5 }} title={disabledReason}>
                       <td style={{ fontVariantNumeric: 'tabular-nums' }}>{r.time}</td>
                       <td>
                         {r.clinic === '?'
@@ -178,6 +180,7 @@ export default function HubFeedback() {
                           style={{ minWidth: 100 }}
                           value={r.first_name}
                           disabled={!r.phone_valid}
+                          title={disabledReason}
                           onChange={e => updateRow(r.event_id, { first_name: e.target.value })}
                         />
                       </td>
@@ -188,6 +191,7 @@ export default function HubFeedback() {
                         <input
                           type="checkbox"
                           disabled={!r.phone_valid}
+                          title={disabledReason}
                           checked={r.medreviews}
                           onChange={e => updateRow(r.event_id, { medreviews: e.target.checked })}
                         />
@@ -196,6 +200,7 @@ export default function HubFeedback() {
                         <input
                           type="checkbox"
                           disabled={!r.phone_valid}
+                          title={disabledReason}
                           checked={r.google_haifa}
                           onChange={e => updateRow(r.event_id, { google_haifa: e.target.checked })}
                         />
@@ -204,6 +209,7 @@ export default function HubFeedback() {
                         <input
                           type="checkbox"
                           disabled={!r.phone_valid}
+                          title={disabledReason}
                           checked={r.google_tlv}
                           onChange={e => updateRow(r.event_id, { google_tlv: e.target.checked })}
                         />
@@ -215,7 +221,8 @@ export default function HubFeedback() {
                         )}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
