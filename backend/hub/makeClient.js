@@ -26,6 +26,8 @@ async function runScenario(scenarioId, data) {
 
 async function fetchAppointmentsForDate(date) {
   const result = await runScenario(FETCH_APPOINTMENTS_SCENARIO_ID, { date });
+  // TEMPORARY DIAGNOSTIC - top-level shape only, never patient content. Remove after debugging.
+  console.log('[makeClient][DEBUG] raw run() top-level keys:', result ? Object.keys(result) : '(none)');
   return result && result.outputs;
 }
 
