@@ -15,12 +15,18 @@ function parseAppointmentsOutput(outputs) {
   return Array.isArray(appointments) ? appointments : [];
 }
 
-// Calendar titles are written "משפחה פרטי" (last name first), so the default
-// first name is the last word; a single-word title is left as-is.
+// Calendar titles are written "פרטי משפחה" (first name first), so the default
+// first name is the first word; a single-word title is left as-is.
 function extractDefaultFirstName(name) {
   if (!name) return '';
   const parts = name.trim().split(/\s+/);
-  return parts[parts.length - 1];
+  return parts[0];
+}
+
+// Manual calendar entries occasionally include a hyphen or space in the phone
+// (e.g. "052-6516944"); strip anything but digits before it's ever used to send.
+function sanitizePhone(phone) {
+  return (phone || '').replace(/\D/g, '');
 }
 
 function isPhoneValid(phone) {
@@ -52,6 +58,7 @@ module.exports = {
   DEFAULT_TEST_PHONE,
   parseAppointmentsOutput,
   extractDefaultFirstName,
+  sanitizePhone,
   isPhoneValid,
   applyTestModePhone,
   buildSendSummary,

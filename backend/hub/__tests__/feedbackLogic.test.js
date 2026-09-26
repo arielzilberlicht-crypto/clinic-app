@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const {
   parseAppointmentsOutput,
   extractDefaultFirstName,
+  sanitizePhone,
   isPhoneValid,
   applyTestModePhone,
   buildSendSummary,
@@ -33,8 +34,8 @@ test('parseAppointmentsOutput: malformed JSON string', () => {
   assert.deepEqual(parseAppointmentsOutput({ appointments: '{not json' }), []);
 });
 
-test('extractDefaultFirstName: last word of a two-word name', () => {
-  assert.equal(extractDefaultFirstName('כהן ענבל'), 'ענבל');
+test('extractDefaultFirstName: first word of a two-word name', () => {
+  assert.equal(extractDefaultFirstName('ענבל כהן'), 'ענבל');
 });
 
 test('extractDefaultFirstName: single-word name unchanged', () => {
@@ -44,6 +45,16 @@ test('extractDefaultFirstName: single-word name unchanged', () => {
 test('extractDefaultFirstName: empty/missing name', () => {
   assert.equal(extractDefaultFirstName(''), '');
   assert.equal(extractDefaultFirstName(undefined), '');
+});
+
+test('sanitizePhone: strips hyphens and spaces from manually-entered numbers', () => {
+  assert.equal(sanitizePhone('052-6516944'), '0526516944');
+  assert.equal(sanitizePhone('052 690 4352'), '0526904352');
+});
+
+test('sanitizePhone: empty/missing phone', () => {
+  assert.equal(sanitizePhone(''), '');
+  assert.equal(sanitizePhone(undefined), '');
 });
 
 test('isPhoneValid: "0" is invalid, a real number is valid', () => {

@@ -6,6 +6,7 @@ const { logAudit } = require('../auditLog');
 const {
   parseAppointmentsOutput,
   extractDefaultFirstName,
+  sanitizePhone,
   isPhoneValid,
   applyTestModePhone,
   buildSendSummary,
@@ -34,14 +35,17 @@ router.get('/appointments', async (req, res) => {
     const raw = parseAppointmentsOutput(outputs);
 
     // Explicit allowlist: `summary` may contain an ID number and must never reach the client.
-    const appointments = raw.map(appt => ({
-      event_id: appt.event_id,
-      time: appt.time,
-      clinic: appt.clinic,
-      phone: appt.phone,
-      default_first_name: extractDefaultFirstName(appt.name),
-      phone_valid: isPhoneValid(appt.phone)
-    }));
+    const appointments = raw.map(appt => {
+      const phone = sanitizePhone(appt.phone);
+      return {
+        event_id: appt.event_id,
+        time: appt.time,
+        clinic: appt.clinic,
+        phone,
+        default_first_name: extractDefaultFirstName(appt.name),
+        phone_valid: isPhoneValid(phone)
+      };
+    });
 
     res.json({ appointments });
   } catch (err) {
