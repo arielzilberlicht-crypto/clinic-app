@@ -31,7 +31,15 @@ router.get('/appointments', async (req, res) => {
 
   try {
     const outputs = await makeClient.fetchAppointmentsForDate(date);
+    // TEMPORARY DIAGNOSTIC - counts/types only, never patient content. Remove after debugging.
+    console.log('[Hub Feedback][DEBUG] outputs is', outputs === undefined ? 'undefined' : (outputs === null ? 'null' : typeof outputs));
+    console.log('[Hub Feedback][DEBUG] outputs keys:', outputs ? Object.keys(outputs) : '(none)');
+    console.log('[Hub Feedback][DEBUG] outputs.appointments type:', outputs && typeof outputs.appointments);
+    if (outputs && typeof outputs.appointments === 'string') {
+      console.log('[Hub Feedback][DEBUG] appointments string length:', outputs.appointments.length);
+    }
     const raw = parseAppointmentsOutput(outputs);
+    console.log('[Hub Feedback][DEBUG] parsed raw appointments count:', raw.length);
 
     // Explicit allowlist: `summary` may contain an ID number and must never reach the client.
     const appointments = raw.map(appt => ({
