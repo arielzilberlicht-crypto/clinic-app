@@ -47,7 +47,12 @@ async function runScenarioAndGetOutputs(scenarioId, data) {
   const detail = await getExecution(scenarioId, runResult.executionId);
   // TEMPORARY DIAGNOSTIC - shape only, never patient content. Remove after debugging.
   console.log('[makeClient][DEBUG] execution detail top-level keys:', detail ? Object.keys(detail) : '(none)');
-  return detail && (detail.outputs || (detail.execution && detail.execution.outputs));
+  console.log('[makeClient][DEBUG] scenarioLog keys:', detail && detail.scenarioLog ? Object.keys(detail.scenarioLog) : '(none)');
+  return detail && (
+    detail.outputs ||
+    (detail.execution && detail.execution.outputs) ||
+    (detail.scenarioLog && detail.scenarioLog.outputs)
+  );
 }
 
 async function fetchAppointmentsForDate(date) {
