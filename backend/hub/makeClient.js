@@ -24,15 +24,36 @@ async function runScenario(scenarioId, data) {
   return res.data;
 }
 
+async function getExecution(scenarioId, executionId) {
+  const token = getToken();
+  const res = await axios.get(
+    `${MAKE_BASE_URL}/scenarios/${scenarioId}/executions/${executionId}`,
+    { headers: { Authorization: `Token ${token}` } }
+  );
+  return res.data;
+}
+
+// The run() response doesn't always carry `outputs` inline (per Make's docs, this can
+// depend on execution timing) - fall back to a separate execution lookup when it's missing.
+async function runScenarioAndGetOutputs(scenarioId, data) {
+  const runResult = await runScenario(scenarioId, data);
+  if (runResult && runResult.outputs) return runResult.outputs;
+
+  if (!runResult || !runResult.executionId) return undefined;
+
+  const detail = await getExecution(scenarioId, runResult.executionId);
+  // TEMPORARY DIAGNOSTIC - shape only, never patient content. Remove after debugging.
+  console.log('[makeClient][DEBUG] execution detail top-level keys:', detail ? Object.keys(detail) : '(none)');
+  return detail && (detail.outputs || (detail.execution && detail.execution.outputs));
+}
+
 async function fetchAppointmentsForDate(date) {
-  const result = await runScenario(FETCH_APPOINTMENTS_SCENARIO_ID, { date });
-  // TEMPORARY DIAGNOSTIC - top-level shape only, never patient content. Remove after debugging.
-  console.log('[makeClient][DEBUG] raw run() top-level keys:', result ? Object.keys(result) : '(none)');
-  return result && result.outputs;
+  return runScenarioAndGetOutputs(FETCH_APPOINTMENTS_SCENARIO_ID, { date });
 }
 
 module.exports = {
   runScenario,
+  runScenarioAndGetOutputs,
   fetchAppointmentsForDate,
   FETCH_APPOINTMENTS_SCENARIO_ID,
   SEND_FEEDBACK_SCENARIO_ID
