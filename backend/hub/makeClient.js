@@ -27,8 +27,11 @@ async function runScenario(scenarioId, data) {
 async function getExecution(scenarioId, executionId) {
   const token = getToken();
   const res = await axios.get(
-    `${MAKE_BASE_URL}/scenarios/${scenarioId}/executions/${executionId}`,
-    { headers: { Authorization: `Token ${token}` } }
+    `${MAKE_BASE_URL}/scenarios/${scenarioId}/logs/${executionId}`,
+    {
+      params: { 'cols[]': 'outputs' },
+      headers: { Authorization: `Token ${token}` }
+    }
   );
   return res.data;
 }
