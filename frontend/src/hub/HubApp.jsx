@@ -8,6 +8,7 @@ import HubToday from './pages/HubToday';
 import HubLeads from './pages/HubLeads';
 import HubPatientCard from './pages/HubPatientCard';
 import HubFeedback from './pages/HubFeedback';
+import HubReferralSource from './pages/HubReferralSource';
 
 const NAV_ITEMS = [
   { path: '/hub', label: 'סקירה כללית', end: true },
@@ -15,7 +16,8 @@ const NAV_ITEMS = [
   { path: '/hub/today', label: 'היום' },
   { path: '/hub/leads', label: 'לידים' },
   { path: '/hub/patients', label: 'כרטיס מטופלת' },
-  { path: '/hub/feedback', label: 'משובים', doctorOnly: true }
+  { path: '/hub/feedback', label: 'משובים', doctorOnly: true },
+  { path: '/hub/referral-source', label: 'מקור הגעה', doctorOnly: true }
 ];
 
 function HubShell() {
@@ -71,6 +73,7 @@ function HubShell() {
           <Route path="/patients" element={<HubPatientCard />} />
           <Route path="/patients/:patientId" element={<HubPatientCard />} />
           <Route path="/feedback" element={<HubFeedback />} />
+          <Route path="/referral-source" element={<HubReferralSource />} />
           <Route path="*" element={<Navigate to="/hub" replace />} />
         </Routes>
       </main>
